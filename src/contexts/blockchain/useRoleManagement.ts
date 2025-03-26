@@ -1,48 +1,3 @@
-
-import { useState } from 'react';
-import { ethers } from 'ethers';
-import { 
-  registerUser,
-  registerBank,
-  assignAdminRole 
-} from '../../services/blockchain/roleManagementService';
-import {
-  createUser,
-  updateUserInfo
-} from '../../services/database/userService';
-import { toast } from 'sonner';
-
-interface UseRoleManagementProps {
-  setIsLoading: (isLoading: boolean) => void;
-  setError: (error: string | null) => void;
-  provider: ethers.providers.Web3Provider | null;
-}
-
-export const useRoleManagement = ({ setIsLoading, setError, provider }: UseRoleManagementProps) => {
-  // Role Management Functions
-  const registerNewUser = async (address: string, userData?: { fullName: string, email?: string }) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      if (!provider) throw new Error('Provider not connected');
-      
-      // 1. Register user on blockchain
-      await registerUser(address, provider);
-      
-      // 2. Save user data to MongoDB if provided
-      if (userData) {
-        // const savedUser = await saveUserInfo({
-        //   walletAddress: address,
-        //   fullName: userData.fullName,
-        //   email: userData.email
-        // });
-        
-        // if (!savedUser) {
-        //   throw new Error('Failed to save user information');
-        // }
-      }
-
 import { useState } from 'react';
 import { ethers } from 'ethers';
 import { 
@@ -153,7 +108,7 @@ export const useRoleManagement = ({ setIsLoading, setError, provider }: UseRoleM
       await assignAdminRole(address, provider);
       
       // Update user role in MongoDB
-      const savedUser = await saveUserInfo({
+      const savedUser = await updateUserInfo({
         walletAddress: address,
         // We're just updating the MongoDB record to reflect the blockchain change
         // The actual role is maintained by the blockchain
