@@ -1,6 +1,7 @@
 
 import { ethers } from 'ethers';
 import { toast } from 'sonner';
+import { getRpcUrl } from '../../config/env';
 
 // Provider and signer
 let provider: ethers.providers.Web3Provider | null = null;
@@ -17,14 +18,19 @@ export const initBlockchain = async () => {
       provider = new ethers.providers.Web3Provider(window.ethereum);
       signer = provider.getSigner();
       
+      // Check if connected to the expected network
+      const chainId = (await provider.getNetwork()).chainId.toString();
+      console.log("Connected to chain ID:", chainId);
+      
       return true;
     } catch (error) {
       console.error('Error initializing blockchain:', error);
-      toast('Error connecting to blockchain. Please try again.');
+      toast.error('Error connecting to blockchain. Please ensure MetaMask is installed and unlocked.');
       return false;
     }
   } else {
     console.error('MetaMask not detected');
+    toast.error('MetaMask not detected. Please install MetaMask to use this application.');
     return false;
   }
 };
@@ -73,7 +79,7 @@ export const connectWallet = async () => {
   try {
     if (await initBlockchain()) {
       const account = await getCurrentAccount();
-      const chainId = (await provider?.getNetwork())?.chainId;
+      const chainId = (await provider?.getNetwork())?.chainId.toString();
       
       return {
         provider,
@@ -88,6 +94,52 @@ export const connectWallet = async () => {
   }
 };
 
+// Request network change if needed
+export const switchToRequiredNetwork = async (targetChainId: string) => {
+  if (!window.ethereum) return false;
+  
+  try {
+    // Check if we're already on the correct network
+    const currentChainId = (await provider?.getNetwork())?.chainId.toString();
+    if (currentChainId === targetChainId) return true;
+    
+    // Try to switch to the target network
+    await window.ethereum.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: `0x${parseInt(targetChainId).toString(16)}` }],
+    });
+    
+    return true;
+  } catch (error: any) {
+    // If the chain hasn't been added to MetaMask, add it
+    if (error.code === 4902) {
+      try {
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [
+            {
+              chainId: `0x${parseInt(targetChainId).toString(16)}`,
+              chainName: getNetworkName(targetChainId),
+              rpcUrls: [getRpcUrl(targetChainId)],
+              nativeCurrency: {
+                name: 'Ether',
+                symbol: 'ETH',
+                decimals: 18,
+              },
+            },
+          ],
+        });
+        return true;
+      } catch (addError) {
+        console.error('Error adding network to MetaMask:', addError);
+        return false;
+      }
+    }
+    console.error('Error switching network:', error);
+    return false;
+  }
+};
+
 // Get network name from chain ID
 export const getNetworkName = (chainId: string): string => {
   const networks: Record<string, string> = {
@@ -98,7 +150,8 @@ export const getNetworkName = (chainId: string): string => {
     '42': 'Kovan',
     '56': 'Binance Smart Chain',
     '137': 'Polygon',
-    '80001': 'Mumbai Testnet'
+    '80001': 'Mumbai Testnet',
+    '5777': 'Ganache Local'
   };
   
   return networks[chainId] || `Unknown Network (${chainId})`;
