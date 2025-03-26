@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { ethers } from 'ethers';
 import { 
@@ -6,8 +7,8 @@ import {
   assignAdminRole 
 } from '../../services/blockchain/roleManagementService';
 import {
-  createUser,
-  updateUserInfo
+  saveUserInfo,
+  saveBankInfo
 } from '../../services/database/userService';
 import { toast } from 'sonner';
 
@@ -31,7 +32,7 @@ export const useRoleManagement = ({ setIsLoading, setError, provider }: UseRoleM
       
       // 2. Save user data to MongoDB if provided
       if (userData) {
-        // const savedUser = await createUser({
+        // const savedUser = await saveUserInfo({
         //   walletAddress: address,
         //   fullName: userData.fullName,
         //   email: userData.email
@@ -108,7 +109,7 @@ export const useRoleManagement = ({ setIsLoading, setError, provider }: UseRoleM
       await assignAdminRole(address, provider);
       
       // Update user role in MongoDB
-      const savedUser = await updateUserInfo({
+      const savedUser = await saveUserInfo({
         walletAddress: address,
         // We're just updating the MongoDB record to reflect the blockchain change
         // The actual role is maintained by the blockchain
