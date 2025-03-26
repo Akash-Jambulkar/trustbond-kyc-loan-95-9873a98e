@@ -2,8 +2,15 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import Logo from '../Logo';
-import SidebarLinks, { SidebarLink } from './SidebarLinks';
+import SidebarLinks from './SidebarLinks';
 import UserProfileSection, { UserProfile } from './UserProfileSection';
+import { UserRole } from '@/contexts/blockchain/BlockchainTypes';
+
+interface SidebarLink {
+  label: string;
+  href: string;
+  icon: React.ReactNode;
+}
 
 interface SidebarComponentProps {
   sidebarOpen: boolean;
@@ -44,7 +51,7 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
 
           <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
             <SidebarLinks 
-              userRole={user.role}
+              userRole={user.role as UserRole}
               links={sidebarLinks} 
               sidebarOpen={sidebarOpen} 
               setSidebarOpen={setSidebarOpen} 
@@ -70,7 +77,7 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
         </div>
         <div className="flex flex-col flex-grow pt-5 pb-4 overflow-y-auto">
           <SidebarLinks 
-            userRole={user.role}
+            userRole={user.role as UserRole}
             links={sidebarLinks} 
           />
         </div>
