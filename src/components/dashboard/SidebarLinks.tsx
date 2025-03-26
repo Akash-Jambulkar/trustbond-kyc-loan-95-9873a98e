@@ -24,16 +24,38 @@ import { Button } from "@/components/ui/button";
 import { Separator } from '@/components/ui/separator';
 import { UserRole } from '@/contexts/blockchain/BlockchainTypes';
 
-interface SidebarLinksProps {
-  userRole: UserRole | null;
+// Export the SidebarLink interface so it can be imported in other files
+export interface SidebarLink {
+  label: string;
+  href: string;
+  icon: React.ReactNode;
 }
 
-const SidebarLinks: React.FC<SidebarLinksProps> = ({ userRole }) => {
+interface SidebarLinksProps {
+  userRole: UserRole | null;
+  links?: SidebarLink[]; // Add links prop support for backward compatibility
+  sidebarOpen?: boolean;
+  setSidebarOpen?: (open: boolean) => void;
+}
+
+const SidebarLinks: React.FC<SidebarLinksProps> = ({ 
+  userRole, 
+  links, 
+  sidebarOpen, 
+  setSidebarOpen 
+}) => {
   const location = useLocation();
   const currentPath = location.pathname;
 
   const isActive = (path: string) => {
     return currentPath === path ? true : false;
+  };
+
+  // Handle mobile navigation closure when clicking on a link
+  const handleLinkClick = () => {
+    if (sidebarOpen && setSidebarOpen) {
+      setSidebarOpen(false);
+    }
   };
 
   return (
@@ -46,6 +68,7 @@ const SidebarLinks: React.FC<SidebarLinksProps> = ({ userRole }) => {
             variant={isActive('/') ? "secondary" : "ghost"}
             className="w-full justify-start"
             asChild
+            onClick={handleLinkClick}
           >
             <Link to="/">
               <Home className="mr-2 h-4 w-4" />
@@ -59,6 +82,7 @@ const SidebarLinks: React.FC<SidebarLinksProps> = ({ userRole }) => {
               variant={isActive('/user/dashboard') ? "secondary" : "ghost"}
               className="w-full justify-start"
               asChild
+              onClick={handleLinkClick}
             >
               <Link to="/user/dashboard">
                 <User className="mr-2 h-4 w-4" />
@@ -72,6 +96,7 @@ const SidebarLinks: React.FC<SidebarLinksProps> = ({ userRole }) => {
               variant={isActive('/bank/dashboard') ? "secondary" : "ghost"}
               className="w-full justify-start"
               asChild
+              onClick={handleLinkClick}
             >
               <Link to="/bank/dashboard">
                 <Building2 className="mr-2 h-4 w-4" />
@@ -85,6 +110,7 @@ const SidebarLinks: React.FC<SidebarLinksProps> = ({ userRole }) => {
               variant={isActive('/admin/dashboard') ? "secondary" : "ghost"}
               className="w-full justify-start"
               asChild
+              onClick={handleLinkClick}
             >
               <Link to="/admin/dashboard">
                 <Shield className="mr-2 h-4 w-4" />

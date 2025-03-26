@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -237,7 +236,10 @@ const ApiDirectory: React.FC = () => {
   ];
 
   return (
-    <PageLayout>
+    <PageLayout 
+      title="API Directory"
+      description="Complete reference of all available APIs for the TrustBond DeFi KYC & Loan Platform"
+    >
       <div className="container mx-auto py-10 px-4 max-w-7xl">
         <h1 className="text-3xl font-bold mb-2">API Directory</h1>
         <p className="text-muted-foreground mb-6">

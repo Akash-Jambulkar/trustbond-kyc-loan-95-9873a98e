@@ -44,6 +44,7 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
 
           <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
             <SidebarLinks 
+              userRole={user.role}
               links={sidebarLinks} 
               sidebarOpen={sidebarOpen} 
               setSidebarOpen={setSidebarOpen} 
@@ -68,7 +69,10 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
           <Logo dark />
         </div>
         <div className="flex flex-col flex-grow pt-5 pb-4 overflow-y-auto">
-          <SidebarLinks links={sidebarLinks} />
+          <SidebarLinks 
+            userRole={user.role}
+            links={sidebarLinks} 
+          />
         </div>
         <div className="flex-shrink-0 flex border-t border-border p-4">
           <div className="flex-shrink-0 w-full group block">
