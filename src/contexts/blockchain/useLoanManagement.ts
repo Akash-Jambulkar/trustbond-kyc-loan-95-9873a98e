@@ -9,6 +9,7 @@ import {
   getBankLoans,
   repayLoan 
 } from '../../services/blockchain/loanManagementService';
+import { toast } from 'sonner';
 
 interface UseLoanManagementProps {
   setIsLoading: (isLoading: boolean) => void;
@@ -26,8 +27,11 @@ export const useLoanManagement = ({ setIsLoading, setError, provider }: UseLoanM
       if (!provider) throw new Error('Provider not connected');
       
       await requestLoan(bankAddress, amount, purpose, duration, provider);
+      toast.success('Loan request submitted successfully');
     } catch (err: any) {
+      console.error('Error requesting loan:', err);
       setError(err.message || 'Failed to request loan');
+      toast.error(err.message || 'Failed to request loan');
       throw err;
     } finally {
       setIsLoading(false);
@@ -42,8 +46,11 @@ export const useLoanManagement = ({ setIsLoading, setError, provider }: UseLoanM
       if (!provider) throw new Error('Provider not connected');
       
       await approveLoan(loanId, provider);
+      toast.success('Loan approved successfully');
     } catch (err: any) {
+      console.error('Error approving loan:', err);
       setError(err.message || 'Failed to approve loan');
+      toast.error(err.message || 'Failed to approve loan');
       throw err;
     } finally {
       setIsLoading(false);
@@ -58,8 +65,11 @@ export const useLoanManagement = ({ setIsLoading, setError, provider }: UseLoanM
       if (!provider) throw new Error('Provider not connected');
       
       await rejectLoan(loanId, provider);
+      toast.success('Loan rejected successfully');
     } catch (err: any) {
+      console.error('Error rejecting loan:', err);
       setError(err.message || 'Failed to reject loan');
+      toast.error(err.message || 'Failed to reject loan');
       throw err;
     } finally {
       setIsLoading(false);
@@ -70,8 +80,10 @@ export const useLoanManagement = ({ setIsLoading, setError, provider }: UseLoanM
     try {
       if (!provider) throw new Error('Provider not connected');
       
-      return await getLoanDetails(loanId, provider);
+      const loanDetails = await getLoanDetails(loanId, provider);
+      return loanDetails;
     } catch (err: any) {
+      console.error('Error getting loan details:', err);
       setError(err.message || 'Failed to get loan details');
       throw err;
     }
@@ -81,8 +93,10 @@ export const useLoanManagement = ({ setIsLoading, setError, provider }: UseLoanM
     try {
       if (!provider) throw new Error('Provider not connected');
       
-      return await getUserLoans(address, provider);
+      const loans = await getUserLoans(address, provider);
+      return loans;
     } catch (err: any) {
+      console.error('Error getting user loans:', err);
       setError(err.message || 'Failed to get user loans');
       throw err;
     }
@@ -92,8 +106,10 @@ export const useLoanManagement = ({ setIsLoading, setError, provider }: UseLoanM
     try {
       if (!provider) throw new Error('Provider not connected');
       
-      return await getBankLoans(address, provider);
+      const loans = await getBankLoans(address, provider);
+      return loans;
     } catch (err: any) {
+      console.error('Error getting bank loans:', err);
       setError(err.message || 'Failed to get bank loans');
       throw err;
     }
@@ -107,8 +123,11 @@ export const useLoanManagement = ({ setIsLoading, setError, provider }: UseLoanM
       if (!provider) throw new Error('Provider not connected');
       
       await repayLoan(loanId, amount, provider);
+      toast.success('Loan payment made successfully');
     } catch (err: any) {
+      console.error('Error repaying loan:', err);
       setError(err.message || 'Failed to repay loan');
+      toast.error(err.message || 'Failed to repay loan');
       throw err;
     } finally {
       setIsLoading(false);

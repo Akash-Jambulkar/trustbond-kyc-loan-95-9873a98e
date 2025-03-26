@@ -1,14 +1,13 @@
 
 import mongoose from 'mongoose';
 import { toast } from 'sonner';
+import { MONGODB_URI } from '../../config/env';
 
 // MongoDB connection
 const connectDB = async () => {
   try {
-    // Use environment variable or default to localhost
-    const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/defi-kyc-loan';
-    
-    await mongoose.connect(mongoURI);
+    // Use environment variable from config
+    await mongoose.connect(MONGODB_URI);
     console.log('MongoDB Connected...');
     return true;
   } catch (err: any) {

@@ -32,15 +32,15 @@ export const useRoleManagement = ({ setIsLoading, setError, provider }: UseRoleM
       
       // 2. Save user data to MongoDB if provided
       if (userData) {
-        // const savedUser = await saveUserInfo({
-        //   walletAddress: address,
-        //   fullName: userData.fullName,
-        //   email: userData.email
-        // });
+        const savedUser = await saveUserInfo({
+          walletAddress: address,
+          fullName: userData.fullName,
+          email: userData.email
+        });
         
-        // if (!savedUser) {
-        //   throw new Error('Failed to save user information');
-        // }
+        if (!savedUser) {
+          throw new Error('Failed to save user information');
+        }
       }
       
       toast.success('User registered successfully');
@@ -74,18 +74,18 @@ export const useRoleManagement = ({ setIsLoading, setError, provider }: UseRoleM
       await registerBank(address, name, regId, provider);
       
       // 2. Save bank data to MongoDB
-      // const bankData = {
-      //   walletAddress: address,
-      //   name,
-      //   registrationId: regId,
-      //   ...additionalInfo
-      // };
+      const bankData = {
+        walletAddress: address,
+        name,
+        registrationId: regId,
+        ...additionalInfo
+      };
       
-      // const savedBank = await saveBankInfo(bankData);
+      const savedBank = await saveBankInfo(bankData);
       
-      // if (!savedBank) {
-      //   throw new Error('Failed to save bank information');
-      // }
+      if (!savedBank) {
+        throw new Error('Failed to save bank information');
+      }
       
       toast.success('Bank registered successfully');
     } catch (err: any) {
