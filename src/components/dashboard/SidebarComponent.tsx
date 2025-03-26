@@ -5,12 +5,7 @@ import Logo from '../Logo';
 import SidebarLinks from './SidebarLinks';
 import UserProfileSection, { UserProfile } from './UserProfileSection';
 import { UserRole } from '@/contexts/blockchain/BlockchainTypes';
-
-interface SidebarLink {
-  label: string;
-  href: string;
-  icon: React.ReactNode;
-}
+import { SidebarLink } from './SidebarLinks';
 
 interface SidebarComponentProps {
   sidebarOpen: boolean;
@@ -52,7 +47,6 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
           <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
             <SidebarLinks 
               userRole={user.role as UserRole}
-              links={sidebarLinks} 
               sidebarOpen={sidebarOpen} 
               setSidebarOpen={setSidebarOpen} 
             />
@@ -78,7 +72,6 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
         <div className="flex flex-col flex-grow pt-5 pb-4 overflow-y-auto">
           <SidebarLinks 
             userRole={user.role as UserRole}
-            links={sidebarLinks} 
           />
         </div>
         <div className="flex-shrink-0 flex border-t border-border p-4">
