@@ -2,133 +2,137 @@
 import { ethers } from 'ethers';
 import { toast } from 'sonner';
 import { APP_CONFIG } from '../config/env';
+import { CONTRACT_ADDRESSES } from '../services/blockchain/contractAddresses';
 
-/**
- * Helper function to check if Ganache is running and properly set up
- */
+// Check if Ganache is running
 export const checkGanacheConnection = async (): Promise<boolean> => {
   try {
-    // Create a JsonRpcProvider connection to Ganache
     const provider = new ethers.providers.JsonRpcProvider(APP_CONFIG.RPC_URLS[5777]);
-    
-    // Try to get the network - this will fail if Ganache isn't running
-    const network = await provider.getNetwork();
-    
-    if (network.chainId === 5777) {
-      console.log("Successfully connected to Ganache");
-      return true;
-    }
-    
-    console.error("Connected to a network, but it's not Ganache (chainId: 5777)");
-    toast.error("Connected to the wrong network. Please make sure Ganache is running.");
-    return false;
+    await provider.getBlockNumber();
+    return true;
   } catch (error) {
-    console.error("Failed to connect to Ganache:", error);
-    toast.error("Failed to connect to Ganache. Please make sure it's running on http://127.0.0.1:7545");
+    console.error('Ganache connection error:', error);
     return false;
   }
 };
 
-/**
- * Add Ganache network to MetaMask if it doesn't exist
- */
+// Add Ganache network to MetaMask
 export const addGanacheToMetaMask = async (): Promise<boolean> => {
   if (!window.ethereum) {
-    toast.error("MetaMask not detected. Please install MetaMask to use this application.");
+    toast.error('MetaMask is not installed');
     return false;
   }
-  
+
   try {
-    // Check if we're already connected to Ganache
-    const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-    if (chainId === '0x1691') { // 0x1691 is hex for 5777
-      console.log("Already connected to Ganache");
-      return true;
-    }
-    
-    // Try to switch to Ganache
     await window.ethereum.request({
-      method: 'wallet_switchEthereumChain',
-      params: [{ chainId: '0x1691' }], // 0x1691 is hex for 5777
+      method: 'wallet_addEthereumChain',
+      params: [
+        {
+          chainId: '0x1691', // 5777 in hex
+          chainName: 'Ganache Local',
+          nativeCurrency: {
+            name: 'Ethereum',
+            symbol: 'ETH',
+            decimals: 18,
+          },
+          rpcUrls: [APP_CONFIG.RPC_URLS[5777]],
+        },
+      ],
     });
-    
+    toast.success('Ganache network added to MetaMask');
     return true;
-  } catch (error: any) {
-    // If the chain hasn't been added to MetaMask, add it
-    if (error.code === 4902) {
-      try {
-        await window.ethereum.request({
-          method: 'wallet_addEthereumChain',
-          params: [
-            {
-              chainId: '0x1691', // 0x1691 is hex for 5777
-              chainName: 'Ganache Local',
-              rpcUrls: [APP_CONFIG.RPC_URLS[5777]],
-              nativeCurrency: {
-                name: 'Ether',
-                symbol: 'ETH',
-                decimals: 18,
-              },
-            },
-          ],
-        });
-        return true;
-      } catch (addError) {
-        console.error('Error adding Ganache to MetaMask:', addError);
-        toast.error("Failed to add Ganache to MetaMask. Please add it manually.");
-        return false;
-      }
-    }
-    
-    console.error('Error switching to Ganache:', error);
-    toast.error("Failed to switch to Ganache network. Please check MetaMask.");
+  } catch (error) {
+    console.error('Error adding Ganache to MetaMask:', error);
+    toast.error('Failed to add Ganache to MetaMask');
     return false;
   }
 };
 
-/**
- * Helper function to get test accounts from Ganache
- * Useful for debugging and testing
- */
-export const getGanacheTestAccounts = async (): Promise<string[]> => {
-  try {
-    const provider = new ethers.providers.JsonRpcProvider(APP_CONFIG.RPC_URLS[5777]);
-    const accounts = await provider.listAccounts();
-    return accounts;
-  } catch (error) {
-    console.error("Failed to get Ganache test accounts:", error);
-    return [];
-  }
-};
-
-/**
- * Check if the contract addresses are valid
- */
+// Verify contract addresses
 export const verifyContractAddresses = async (): Promise<boolean> => {
   try {
     const provider = new ethers.providers.JsonRpcProvider(APP_CONFIG.RPC_URLS[5777]);
     
-    // Check if contract addresses have code deployed
-    const contracts = [
-      APP_CONFIG.CONTRACT_ADDRESSES[5777].roleManagement,
-      APP_CONFIG.CONTRACT_ADDRESSES[5777].kycContract,
-      APP_CONFIG.CONTRACT_ADDRESSES[5777].loanManagement,
-      APP_CONFIG.CONTRACT_ADDRESSES[5777].trustScore
+    // Check if all contract addresses are valid
+    const addresses = [
+      CONTRACT_ADDRESSES.roleManagement,
+      CONTRACT_ADDRESSES.kycContract,
+      CONTRACT_ADDRESSES.trustScore,
+      CONTRACT_ADDRESSES.loanManagement
     ];
     
-    for (const address of contracts) {
-      const code = await provider.getCode(address);
+    for (const address of addresses) {
+      if (!ethers.utils.isAddress(address) || address === ethers.constants.AddressZero) {
+        console.error('Invalid contract address:', address);
+        return false;
+      }
       
-      // If code is just "0x", it means there's no contract at this address
-      if (code === "0x") {
-        console.error(`No contract deployed at address: ${address}`);
+      // Check if there's code at the address
+      const code = await provider.getCode(address);
+      if (code === '0x') {
+        console.error('No contract deployed at address:', address);
         return false;
       }
     }
     
     return true;
   } catch (error) {
-    console.error("Failed to verify contract addresses:", error);
+    console.error('Error verifying contract addresses:', error);
     return false;
+  }
+};
+
+// Deploy contracts from the migration script
+export const deployContracts = async (): Promise<boolean> => {
+  try {
+    // This would normally import and run the deployment script
+    // But for security, we'll just show a notification that this should be done manually
+    toast.info(
+      'Contract deployment should be run from the command line for security reasons. Please use `node src/contracts/migrations/deploy_contracts.js`'
+    );
+    return false;
+  } catch (error) {
+    console.error('Error deploying contracts:', error);
+    return false;
+  }
+};
+
+// Get contract information for display
+export const getContractInfo = async (): Promise<any> => {
+  try {
+    const provider = new ethers.providers.JsonRpcProvider(APP_CONFIG.RPC_URLS[5777]);
+    
+    // Get contract details
+    const info = {
+      roleManagement: {
+        address: CONTRACT_ADDRESSES.roleManagement,
+        valid: false
+      },
+      kycContract: {
+        address: CONTRACT_ADDRESSES.kycContract,
+        valid: false
+      },
+      trustScore: {
+        address: CONTRACT_ADDRESSES.trustScore,
+        valid: false
+      },
+      loanManagement: {
+        address: CONTRACT_ADDRESSES.loanManagement,
+        valid: false
+      }
+    };
+    
+    // Check each contract
+    for (const [key, value] of Object.entries(info)) {
+      if (ethers.utils.isAddress(value.address) && value.address !== ethers.constants.AddressZero) {
+        const code = await provider.getCode(value.address);
+        info[key].valid = code !== '0x';
+      }
+    }
+    
+    return info;
+  } catch (error) {
+    console.error('Error getting contract info:', error);
+    return null;
   }
 };
