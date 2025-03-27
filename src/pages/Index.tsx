@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowRightIcon, ShieldCheckIcon, BankIcon, UserIcon, BookOpenIcon } from 'lucide-react';
+import { ArrowRightIcon, ShieldCheckIcon, Building2Icon, UserIcon, BookOpenIcon } from 'lucide-react';
 
 const Index = () => {
   return (
@@ -50,7 +49,7 @@ const Index = () => {
               
               <Card className="animate-hover">
                 <CardHeader>
-                  <BankIcon className="h-10 w-10 text-primary mb-2" />
+                  <Building2Icon className="h-10 w-10 text-primary mb-2" />
                   <CardTitle>Decentralized Loans</CardTitle>
                 </CardHeader>
                 <CardContent>

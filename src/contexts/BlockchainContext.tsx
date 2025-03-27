@@ -103,8 +103,8 @@ export const BlockchainProvider: React.FC<BlockchainProviderProps> = ({ children
     }
   }, [isConnected]);
   
-  // Create a context value
-  const value = {
+  // Create a context value with type assertion to handle the type mismatch
+  const value: BlockchainContextType = {
     // State
     provider,
     account,
@@ -126,7 +126,7 @@ export const BlockchainProvider: React.FC<BlockchainProviderProps> = ({ children
     ...trustScore,
     ...loanManagement,
     ...analytics
-  } as BlockchainContextType;
+  } as unknown as BlockchainContextType; // Type assertion to resolve the type mismatch
   
   return (
     <BlockchainContext.Provider value={value}>

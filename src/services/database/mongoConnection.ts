@@ -63,15 +63,18 @@ const isConnected = () => {
   return isDbConnected || mongoose.connection.readyState === 1;
 };
 
-// Reconnect if connection is lost
-mongoose.connection.on('disconnected', () => {
-  console.log('MongoDB disconnected. Attempting to reconnect...');
-  isDbConnected = false;
-  // Attempt to reconnect
-  setTimeout(() => {
-    connectDB();
-  }, 5000); // Wait 5 seconds before trying to reconnect
-});
+// Fix this section - Only set up event listeners if mongoose.connection exists
+// Mongoose connection events
+if (mongoose.connection) {
+  mongoose.connection.on('disconnected', () => {
+    console.log('MongoDB disconnected. Attempting to reconnect...');
+    isDbConnected = false;
+    // Attempt to reconnect
+    setTimeout(() => {
+      connectDB();
+    }, 5000); // Wait 5 seconds before trying to reconnect
+  });
+}
 
 // Validate text-only input
 const validateTextOnly = (text: string): boolean => {

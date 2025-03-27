@@ -1,4 +1,3 @@
-
 import { z } from 'zod';
 
 // Environment Variable Schema
@@ -116,10 +115,13 @@ const fileUploadRestrictions = {
   textOnlyForDocuments: true
 };
 
-// Exported app configuration
+// Extract the MongoDB URI from environment variables
+const MONGODB_URI = import.meta.env.VITE_MONGODB_URI || '';
+
+// Export the MongoDB URI
 export const APP_CONFIG = {
   // MongoDB
-  MONGODB_URI: ENV.MONGODB_URI,
+  MONGODB_URI,
   
   // Chain Configuration
   DEFAULT_CHAIN_ID: parseInt(ENV.DEFAULT_CHAIN_ID),
