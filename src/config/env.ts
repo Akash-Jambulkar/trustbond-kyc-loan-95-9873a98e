@@ -80,6 +80,35 @@ const getEnvVars = () => {
 // Parse environment variables with fallbacks
 export const ENV = envSchema.parse(getEnvVars());
 
+// Add the getRpcUrl function to retrieve the RPC URL for a specific chain
+export const getRpcUrl = (chainId: string): string => {
+  const chainIdMap: {[key: string]: string} = {
+    '1': ENV.MAINNET_RPC_URL,
+    '5': ENV.GOERLI_RPC_URL,
+    '11155111': ENV.SEPOLIA_RPC_URL,
+    '5777': ENV.GANACHE_RPC_URL
+  };
+  
+  return chainIdMap[chainId] || ENV.GANACHE_RPC_URL; // Default to Ganache if chain not found
+};
+
+// Get network name from chain ID
+export const getNetworkName = (chainId: string): string => {
+  const networks: Record<string, string> = {
+    '1': 'Ethereum Mainnet',
+    '3': 'Ropsten',
+    '4': 'Rinkeby',
+    '5': 'Goerli',
+    '42': 'Kovan',
+    '56': 'Binance Smart Chain',
+    '137': 'Polygon',
+    '80001': 'Mumbai Testnet',
+    '5777': 'Ganache Local'
+  };
+  
+  return networks[chainId] || `Unknown Network (${chainId})`;
+};
+
 // File upload restrictions
 const fileUploadRestrictions = {
   allowedFileTypes: ['text/plain', 'application/pdf', 'image/jpeg', 'image/png'],

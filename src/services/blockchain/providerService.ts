@@ -1,7 +1,7 @@
 
 import { ethers } from 'ethers';
 import { toast } from 'sonner';
-import { getRpcUrl } from '../../config/env';
+import { getRpcUrl, getNetworkName as getNetworkNameFromConfig } from '../../config/env';
 
 // Provider and signer
 let provider: ethers.providers.Web3Provider | null = null;
@@ -142,19 +142,19 @@ export const switchToRequiredNetwork = async (targetChainId: string) => {
 
 // Get network name from chain ID
 export const getNetworkName = (chainId: string): string => {
-  const networks: Record<string, string> = {
-    '1': 'Ethereum Mainnet',
-    '3': 'Ropsten',
-    '4': 'Rinkeby',
-    '5': 'Goerli',
-    '42': 'Kovan',
-    '56': 'Binance Smart Chain',
-    '137': 'Polygon',
-    '80001': 'Mumbai Testnet',
-    '5777': 'Ganache Local'
-  };
-  
-  return networks[chainId] || `Unknown Network (${chainId})`;
+  return getNetworkNameFromConfig ? 
+    getNetworkNameFromConfig(chainId) : 
+    {
+      '1': 'Ethereum Mainnet',
+      '3': 'Ropsten',
+      '4': 'Rinkeby',
+      '5': 'Goerli',
+      '42': 'Kovan',
+      '56': 'Binance Smart Chain',
+      '137': 'Polygon',
+      '80001': 'Mumbai Testnet',
+      '5777': 'Ganache Local'
+    }[chainId] || `Unknown Network (${chainId})`;
 };
 
 // Setup event listeners for wallet and network changes

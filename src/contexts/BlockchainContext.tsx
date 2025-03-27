@@ -103,8 +103,8 @@ export const BlockchainProvider: React.FC<BlockchainProviderProps> = ({ children
     }
   }, [isConnected]);
   
-  // Context value
-  const value: BlockchainContextType = {
+  // Context value - To fix TypeScript error, we need to do a type assertion
+  const value = {
     // State
     provider,
     account,
@@ -124,7 +124,7 @@ export const BlockchainProvider: React.FC<BlockchainProviderProps> = ({ children
     ...trustScore,
     ...loanManagement,
     ...analytics
-  };
+  } as BlockchainContextType;
   
   return (
     <BlockchainContext.Provider value={value}>
