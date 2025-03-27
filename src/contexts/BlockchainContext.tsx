@@ -103,8 +103,8 @@ export const BlockchainProvider: React.FC<BlockchainProviderProps> = ({ children
     }
   }, [isConnected]);
   
-  // Create a properly typed context value
-  const value: BlockchainContextType = {
+  // Create a context value
+  const value = {
     // State
     provider,
     account,
@@ -126,7 +126,7 @@ export const BlockchainProvider: React.FC<BlockchainProviderProps> = ({ children
     ...trustScore,
     ...loanManagement,
     ...analytics
-  };
+  } as BlockchainContextType;
   
   return (
     <BlockchainContext.Provider value={value}>

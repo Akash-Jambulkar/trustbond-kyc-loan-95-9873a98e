@@ -7,4 +7,9 @@ export * from './trustScoreService';
 export * from './loanManagementService';
 export * from './analyticsService';
 export * from './contractAddresses';
-export * from './eventListenerService';
+
+// Export event listener service explicitly to avoid ambiguity
+export { 
+  setupEventListeners as setupEventListenersService,
+  removeEventListeners as removeEventListenersService
+} from './eventListenerService';
