@@ -1,69 +1,88 @@
-# Welcome to your Lovable project
 
-## Project info
+# TrustBond DeFi KYC & Loan Platform
 
-**URL**: https://lovable.dev/projects/570de134-e46b-4584-90df-d05dc36365a2
+A blockchain-based KYC and loan platform integrating Ethereum, MongoDB, and real-time data management.
 
-## How can I edit this code?
+## Environment Setup
 
-There are several ways of editing your application.
+1. **Create a `.env` file** at the root of the project using the template from `.env.example`:
 
-**Use Lovable**
+```bash
+cp .env.example .env
+```
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/570de134-e46b-4584-90df-d05dc36365a2) and start prompting.
+2. **Configure your environment variables** in the `.env` file:
+   - Set your MongoDB connection string
+   - Configure blockchain settings (RPC URLs, contract addresses)
+   - Adjust other application settings as needed
 
-Changes made via Lovable will be committed automatically to this repo.
+## Prerequisites
 
-**Use your preferred IDE**
+- Node.js 16+
+- MongoDB (local or remote instance)
+- Ganache (for local blockchain development)
+- MetaMask browser extension
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Blockchain Setup
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+1. **Install and configure MetaMask**:
+   - Add a new network with RPC URL: `http://127.0.0.1:7545` (for Ganache)
+   - Chain ID: `5777`
 
-Follow these steps:
+2. **Start Ganache**:
+   - Use Ganache UI or CLI to start a local blockchain
+   - Make sure it's running on port 7545
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+3. **Deploy smart contracts** (if needed):
+   - The application is pre-configured to use the contract addresses in the `.env` file
+   - For local development, you can use the default Ganache addresses
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## MongoDB Setup
 
-# Step 3: Install the necessary dependencies.
-npm i
+1. **Start MongoDB**:
+   - Local: Run `mongod` service
+   - Remote: Ensure you have the correct connection string in `.env`
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+2. **Database initialization**:
+   - The application will automatically create the required collections and indexes
+
+## Running the Application
+
+1. **Install dependencies**:
+```bash
+npm install
+```
+
+2. **Start the development server**:
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+3. **Access the application**:
+   - Open your browser at `http://localhost:8080`
+   - Connect your MetaMask wallet to interact with the blockchain features
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Real-Time Data Features
 
-**Use GitHub Codespaces**
+- **Blockchain Status**: View real-time gas prices, network status, and blockchain connection
+- **User KYC Status**: Monitor document verification progress and trust score in real-time
+- **Transaction Monitoring**: Real-time updates for loan and KYC transactions
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Document Management
 
-## What technologies are used for this project?
+The platform supports uploading and validating documents with the following restrictions:
+- File types: Text, PDF, JPEG, PNG
+- Maximum file size: 5MB
+- Text-only validation for text files
 
-This project is built with .
+## Troubleshooting
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- **MongoDB Connection Issues**: Ensure MongoDB is running and accessible
+- **Blockchain Connection Failures**: Verify Ganache is running and MetaMask is correctly configured
+- **Smart Contract Interactions**: Check that contract addresses in `.env` match deployed contracts
 
-## How can I deploy this project?
+## Security Features
 
-Simply open [Lovable](https://lovable.dev/projects/570de134-e46b-4584-90df-d05dc36365a2) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+- Text-only validation for sensitive documents
+- Real-time connection status monitoring
+- Secure client-side file validation before submission

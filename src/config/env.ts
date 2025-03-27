@@ -47,10 +47,10 @@ export const CONTRACT_ADDRESSES = {
   },
   // Local Ganache addresses (for development)
   GANACHE: {
-    roleManagement: '0x8d2b0Bf086880A32eAA3a3d5a6a5f6eb1AF32D24', // Replace with your deployed contract address
-    kycContract: '0xf3E3EfbB1CD7AD01a19a1e46c3C24F32F1f9c167', // Replace with your deployed contract address
-    loanManagement: '0xD21A7e58Fb0F1F77a55F4fa37814842E2e4C399b', // Replace with your deployed contract address
-    trustScore: '0x3a1c85f2425e658091AFAB83DEa4E2c0ac20dDB0', // Replace with your deployed contract address
+    roleManagement: import.meta.env.VITE_GANACHE_ROLE_MANAGEMENT_CONTRACT_ADDRESS || '0x8d2b0Bf086880A32eAA3a3d5a6a5f6eb1AF32D24',
+    kycContract: import.meta.env.VITE_GANACHE_KYC_CONTRACT_ADDRESS || '0xf3E3EfbB1CD7AD01a19a1e46c3C24F32F1f9c167',
+    loanManagement: import.meta.env.VITE_GANACHE_LOAN_MANAGEMENT_CONTRACT_ADDRESS || '0xD21A7e58Fb0F1F77a55F4fa37814842E2e4C399b',
+    trustScore: import.meta.env.VITE_GANACHE_TRUST_SCORE_CONTRACT_ADDRESS || '0x3a1c85f2425e658091AFAB83DEa4E2c0ac20dDB0',
   }
 };
 
