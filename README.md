@@ -1,88 +1,75 @@
 
-# TrustBond DeFi KYC & Loan Platform
+# DeFi KYC & Loan Platform
 
-A blockchain-based KYC and loan platform integrating Ethereum, MongoDB, and real-time data management.
+A decentralized application for KYC verification and loan management on the blockchain.
 
-## Environment Setup
+## Setup Instructions
 
-1. **Create a `.env` file** at the root of the project using the template from `.env.example`:
+### Prerequisites
+- [Node.js](https://nodejs.org/) (v16 or higher)
+- [MetaMask](https://metamask.io/) browser extension
+- [Ganache](https://trufflesuite.com/ganache/) for local blockchain testing
 
-```bash
-cp .env.example .env
-```
+### Ganache Setup
+1. Download and install Ganache from [https://trufflesuite.com/ganache/](https://trufflesuite.com/ganache/)
+2. Create a new workspace
+3. Configure Ganache to run on port 7545 (default)
+4. Start the Ganache blockchain
 
-2. **Configure your environment variables** in the `.env` file:
-   - Set your MongoDB connection string
-   - Configure blockchain settings (RPC URLs, contract addresses)
-   - Adjust other application settings as needed
+### MetaMask Configuration
+1. Install the MetaMask browser extension
+2. Set up a new network in MetaMask with the following details:
+   - Network Name: Ganache Local
+   - New RPC URL: http://127.0.0.1:7545
+   - Chain ID: 5777
+   - Currency Symbol: ETH
+3. Import a test account from Ganache using the private key
 
-## Prerequisites
+### Smart Contract Deployment
+1. Deploy the following contracts to Ganache:
+   - RoleManagement
+   - KYCContract
+   - LoanManagement
+   - TrustScore
+2. Update the contract addresses in the `.env.local` file
 
-- Node.js 16+
-- MongoDB (local or remote instance)
-- Ganache (for local blockchain development)
-- MetaMask browser extension
-
-## Blockchain Setup
-
-1. **Install and configure MetaMask**:
-   - Add a new network with RPC URL: `http://127.0.0.1:7545` (for Ganache)
-   - Chain ID: `5777`
-
-2. **Start Ganache**:
-   - Use Ganache UI or CLI to start a local blockchain
-   - Make sure it's running on port 7545
-
-3. **Deploy smart contracts** (if needed):
-   - The application is pre-configured to use the contract addresses in the `.env` file
-   - For local development, you can use the default Ganache addresses
-
-## MongoDB Setup
-
-1. **Start MongoDB**:
-   - Local: Run `mongod` service
-   - Remote: Ensure you have the correct connection string in `.env`
-
-2. **Database initialization**:
-   - The application will automatically create the required collections and indexes
-
-## Running the Application
-
-1. **Install dependencies**:
+### Install Dependencies
 ```bash
 npm install
 ```
 
-2. **Start the development server**:
+### Environment Configuration
+1. Create a `.env.local` file in the root directory
+2. Copy the contents of `.env.example` into `.env.local`
+3. Update the contract addresses with your deployed contract addresses
+
+### Start the Application
 ```bash
 npm run dev
 ```
 
-3. **Access the application**:
-   - Open your browser at `http://localhost:8080`
-   - Connect your MetaMask wallet to interact with the blockchain features
+## Testing Blockchain Functionality
 
-## Real-Time Data Features
+### Test User Flow
+1. Connect to MetaMask using the "Connect Wallet" button
+2. Register as a user
+3. Submit KYC documents
+4. Apply for a loan
 
-- **Blockchain Status**: View real-time gas prices, network status, and blockchain connection
-- **User KYC Status**: Monitor document verification progress and trust score in real-time
-- **Transaction Monitoring**: Real-time updates for loan and KYC transactions
+### Test Bank Flow
+1. Connect with a different account
+2. Register as a bank
+3. Verify user KYC documents
+4. Review and approve/reject loan applications
 
-## Document Management
-
-The platform supports uploading and validating documents with the following restrictions:
-- File types: Text, PDF, JPEG, PNG
-- Maximum file size: 5MB
-- Text-only validation for text files
+### Test Admin Flow
+1. Connect with the admin account (typically the account that deployed the contracts)
+2. View analytics dashboard
+3. Manage user and bank registrations
 
 ## Troubleshooting
 
-- **MongoDB Connection Issues**: Ensure MongoDB is running and accessible
-- **Blockchain Connection Failures**: Verify Ganache is running and MetaMask is correctly configured
-- **Smart Contract Interactions**: Check that contract addresses in `.env` match deployed contracts
-
-## Security Features
-
-- Text-only validation for sensitive documents
-- Real-time connection status monitoring
-- Secure client-side file validation before submission
+### Common Issues
+- **MetaMask not connecting**: Ensure Ganache is running and you've configured the network correctly in MetaMask
+- **Contract interaction failing**: Verify that contract addresses in `.env.local` match the deployed contracts
+- **Transaction errors**: Make sure you have enough ETH in your test account

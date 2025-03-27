@@ -7,7 +7,7 @@ import { useKYCManagement } from './blockchain/useKYCManagement';
 import { useTrustScore } from './blockchain/useTrustScore';
 import { useLoanManagement } from './blockchain/useLoanManagement';
 import { useAnalytics } from './blockchain/useAnalytics';
-import { removeEventListeners } from '../services/blockchain/providerService';
+import { setupEventListeners, removeEventListeners } from '../services/blockchain/eventListenerService';
 
 const BlockchainContext = createContext<BlockchainContextType | undefined>(undefined);
 
@@ -103,8 +103,8 @@ export const BlockchainProvider: React.FC<BlockchainProviderProps> = ({ children
     }
   }, [isConnected]);
   
-  // Context value - To fix TypeScript error, we need to do a type assertion
-  const value = {
+  // Create a properly typed context value
+  const value: BlockchainContextType = {
     // State
     provider,
     account,
@@ -116,15 +116,17 @@ export const BlockchainProvider: React.FC<BlockchainProviderProps> = ({ children
     isLoading,
     error,
     
-    // Functions
+    // Core wallet functions
     connectToWallet,
     disconnectWallet,
+    
+    // Spread other functionality
     ...roleManagement,
     ...kycManagement,
     ...trustScore,
     ...loanManagement,
     ...analytics
-  } as BlockchainContextType;
+  };
   
   return (
     <BlockchainContext.Provider value={value}>

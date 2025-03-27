@@ -14,7 +14,8 @@ export default defineConfig({
   define: {
     // Polyfill for ethers.js
     'process.env': {},
-    'global': {}
+    'global': {},
+    'Buffer': ['buffer', 'Buffer']
   },
   build: {
     commonjsOptions: {
