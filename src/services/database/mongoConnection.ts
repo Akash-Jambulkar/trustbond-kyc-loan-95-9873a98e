@@ -1,10 +1,12 @@
 
 import mongoose from 'mongoose';
 import { toast } from 'sonner';
-import { MONGODB_URI } from '../../config/env';
+import { APP_CONFIG } from '../../config/env';
 
 // MongoDB connection status
 let isDbConnected = false;
+let connectionRetries = 0;
+const MAX_RETRIES = 3;
 
 // MongoDB connection
 const connectDB = async () => {
@@ -14,15 +16,31 @@ const connectDB = async () => {
     return true;
   }
 
+  if (connectionRetries >= MAX_RETRIES) {
+    console.error('Max MongoDB connection retries reached');
+    toast.error('Could not connect to database after multiple attempts. Please check your connection.');
+    return false;
+  }
+
   try {
     // Use environment variable from config
-    await mongoose.connect(MONGODB_URI);
+    const uri = APP_CONFIG.MONGODB_URI;
+    
+    if (!uri) {
+      console.error('MongoDB URI is not defined in environment variables');
+      toast.error('Database connection URL is not configured. Please check your settings.');
+      return false;
+    }
+
+    await mongoose.connect(uri);
     console.log('MongoDB Connected...');
     isDbConnected = true;
+    connectionRetries = 0; // Reset counter on successful connection
     return true;
   } catch (err: any) {
     console.error('MongoDB connection error:', err.message);
     toast.error('Failed to connect to MongoDB. Please check your connection and try again.');
+    connectionRetries++;
     return false;
   }
 };
@@ -44,6 +62,16 @@ const disconnectDB = async () => {
 const isConnected = () => {
   return isDbConnected || mongoose.connection.readyState === 1;
 };
+
+// Reconnect if connection is lost
+mongoose.connection.on('disconnected', () => {
+  console.log('MongoDB disconnected. Attempting to reconnect...');
+  isDbConnected = false;
+  // Attempt to reconnect
+  setTimeout(() => {
+    connectDB();
+  }, 5000); // Wait 5 seconds before trying to reconnect
+});
 
 // Validate text-only input
 const validateTextOnly = (text: string): boolean => {

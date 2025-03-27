@@ -6,45 +6,43 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Search, UserCheck, CheckCircle, Clock, FileText, ExternalLink } from 'lucide-react';
+import { Search, UserCheck, CheckCircle, Clock, FileText, ExternalLink, RefreshCw } from 'lucide-react';
 import { useBlockchain } from '@/contexts/BlockchainContext';
 import { IKYCDocument } from '@/services/database/models/KYCDocuments';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
+import { connectDB, isConnected } from '@/services/database/mongoConnection';
+import { useRealTimeSync } from '@/hooks/useRealTimeSync';
 
 const UserVerification: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [pendingVerifications, setPendingVerifications] = useState<IKYCDocument[]>([]);
-  const [verifiedDocuments, setVerifiedDocuments] = useState<IKYCDocument[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [selectedDocument, setSelectedDocument] = useState<IKYCDocument | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isVerifyModalOpen, setIsVerifyModalOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const { getPendingKYCRequests, verifyUserKYC } = useBlockchain();
   
-  useEffect(() => {
-    fetchVerifications();
-  }, []);
+  const {
+    data: pendingVerifications,
+    isLoading,
+    lastSynced,
+    manualSync
+  } = useRealTimeSync<IKYCDocument[]>(
+    getPendingKYCRequests,
+    [],
+    30000 // 30 seconds refresh
+  );
   
-  const fetchVerifications = async () => {
+  const verifiedDocuments = pendingVerifications.filter(doc => doc.status === 'verified').slice(0, 4);
+  
+  const handleManualRefresh = async () => {
+    setIsRefreshing(true);
     try {
-      setIsLoading(true);
-      
-      const pendingDocs = await getPendingKYCRequests();
-      
-      const verifiedDocs = pendingDocs
-        .filter(doc => doc.status === 'verified')
-        .slice(0, 4);
-      
-      setPendingVerifications(pendingDocs.filter(doc => doc.status === 'pending'));
-      setVerifiedDocuments(verifiedDocs);
-    } catch (error) {
-      console.error('Error fetching verifications:', error);
-      toast.error('Failed to load verification data');
+      await manualSync();
     } finally {
-      setIsLoading(false);
+      setIsRefreshing(false);
     }
   };
   
@@ -61,7 +59,7 @@ const UserVerification: React.FC = () => {
       
       setIsVerifyModalOpen(false);
       setRejectionReason('');
-      fetchVerifications();
+      manualSync();
       
       toast.success(`Document ${approved ? 'approved' : 'rejected'} successfully`);
     } catch (error) {
@@ -106,11 +104,13 @@ const UserVerification: React.FC = () => {
   };
   
   const filteredPending = searchQuery
-    ? pendingVerifications.filter(doc => 
-        doc.walletAddress.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        doc.documentName.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : pendingVerifications;
+    ? pendingVerifications
+        .filter(doc => doc.status === 'pending')
+        .filter(doc => 
+          doc.walletAddress.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          doc.documentName.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+    : pendingVerifications.filter(doc => doc.status === 'pending');
     
   const filteredVerified = searchQuery
     ? verifiedDocuments.filter(doc => 
@@ -122,8 +122,23 @@ const UserVerification: React.FC = () => {
   return (
     <DashboardLayout>
       <div className="container mx-auto p-6 space-y-6">
-        <h1 className="text-3xl font-bold">User Verification</h1>
-        <p className="text-muted-foreground">Verify users and view their trust scores</p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold">User Verification</h1>
+            <p className="text-muted-foreground">Verify users and view their trust scores</p>
+          </div>
+          
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleManualRefresh}
+            disabled={isRefreshing}
+            className="flex items-center gap-2"
+          >
+            <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            Refresh Data
+          </Button>
+        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           <Card>
@@ -132,7 +147,7 @@ const UserVerification: React.FC = () => {
               <Clock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{pendingVerifications.length}</div>
+              <div className="text-2xl font-bold">{filteredPending.length}</div>
               <p className="text-xs text-muted-foreground mt-2">
                 Awaiting review
               </p>
@@ -191,6 +206,11 @@ const UserVerification: React.FC = () => {
                 <CardTitle>Pending Verification Requests</CardTitle>
                 <CardDescription>
                   Review user documents and KYC applications
+                  {lastSynced && (
+                    <span className="text-xs block mt-1">
+                      Last updated: {lastSynced.toLocaleTimeString()}
+                    </span>
+                  )}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -265,6 +285,11 @@ const UserVerification: React.FC = () => {
                 <CardTitle>Verified Documents</CardTitle>
                 <CardDescription>
                   Documents that have completed verification
+                  {lastSynced && (
+                    <span className="text-xs block mt-1">
+                      Last updated: {lastSynced.toLocaleTimeString()}
+                    </span>
+                  )}
                 </CardDescription>
               </CardHeader>
               <CardContent>
