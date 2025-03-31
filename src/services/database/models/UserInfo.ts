@@ -72,8 +72,14 @@ const UserInfoSchema: Schema = new Schema({
   timestamps: true
 });
 
-// Fix for "Cannot read properties of undefined (reading 'UserInfo')"
-// Check if the model exists before trying to access it
-const UserInfo = mongoose.models.UserInfo || mongoose.model<IUserInfo>('UserInfo', UserInfoSchema);
+// More robust fix for "Cannot read properties of undefined (reading 'UserInfo')"
+let UserInfo;
+try {
+  // Try to get the existing model
+  UserInfo = mongoose.model('UserInfo');
+} catch (error) {
+  // Model doesn't exist, create it
+  UserInfo = mongoose.model<IUserInfo>('UserInfo', UserInfoSchema);
+}
 
 export default UserInfo;
