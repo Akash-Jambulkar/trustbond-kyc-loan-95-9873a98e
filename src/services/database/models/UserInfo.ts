@@ -72,5 +72,8 @@ const UserInfoSchema: Schema = new Schema({
   timestamps: true
 });
 
-// Create model only if it doesn't already exist
-export default mongoose.models.UserInfo || mongoose.model<IUserInfo>('UserInfo', UserInfoSchema);
+// Fix for "Cannot read properties of undefined (reading 'UserInfo')"
+// Check if the model exists before trying to access it
+const UserInfo = mongoose.models.UserInfo || mongoose.model<IUserInfo>('UserInfo', UserInfoSchema);
+
+export default UserInfo;
