@@ -146,3 +146,76 @@ export const listenForTransactions = (
     return () => {};
   }
 };
+
+// Get historical blockchain data for charts
+export const getHistoricalBlockchainData = async (blocks: number = 10) => {
+  try {
+    const provider = getProvider();
+    
+    if (!provider) {
+      throw new Error('Provider not initialized');
+    }
+    
+    const currentBlock = await provider.getBlockNumber();
+    const historicalData = [];
+    
+    // Collect data from the last 'blocks' number of blocks
+    for (let i = 0; i < blocks; i++) {
+      const blockNumber = currentBlock - i;
+      if (blockNumber < 0) break;
+      
+      const block = await provider.getBlock(blockNumber);
+      if (block) {
+        historicalData.push({
+          blockNumber: block.number,
+          timestamp: new Date(block.timestamp * 1000).toISOString(),
+          transactions: block.transactions.length,
+          gasUsed: block.gasUsed.toString(),
+          gasLimit: block.gasLimit.toString()
+        });
+      }
+    }
+    
+    return historicalData.reverse(); // Return in chronological order
+  } catch (error) {
+    console.error('Error getting historical blockchain data:', error);
+    throw error;
+  }
+};
+
+// Get transaction count trend for an address
+export const getTransactionCountTrend = async (address: string, days: number = 7) => {
+  try {
+    const provider = getProvider();
+    
+    if (!provider) {
+      throw new Error('Provider not initialized');
+    }
+    
+    const currentBlock = await provider.getBlockNumber();
+    const blocksPerDay = 6500; // Approximate blocks per day (may vary by network)
+    const data = [];
+    
+    for (let i = 0; i < days; i++) {
+      const blockNumber = currentBlock - (i * blocksPerDay);
+      if (blockNumber < 0) break;
+      
+      // Get transaction count for this address at this block
+      const count = await provider.getTransactionCount(address, blockNumber);
+      
+      // Get block timestamp
+      const block = await provider.getBlock(blockNumber);
+      
+      data.push({
+        day: days - i,
+        date: new Date(block.timestamp * 1000).toISOString().split('T')[0],
+        count
+      });
+    }
+    
+    return data.reverse(); // Return in chronological order
+  } catch (error) {
+    console.error('Error getting transaction count trend:', error);
+    throw error;
+  }
+};
