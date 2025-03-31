@@ -12,43 +12,63 @@ The system consists of four main contracts:
 3. **TrustScore.sol** - Calculates and manages user trust scores
 4. **LoanManagement.sol** - Handles loan applications, approvals, and repayments
 
+## Prerequisites
+
+Before deploying the contracts, ensure you have the following installed:
+
+- [Node.js](https://nodejs.org/) (v16 or higher)
+- [Truffle](https://trufflesuite.com/truffle/) (`npm install -g truffle`)
+- [Ganache](https://trufflesuite.com/ganache/) for local blockchain
+
 ## Contract Deployment
 
-The contracts should be deployed in the following order:
+### Option 1: Using Truffle (Recommended)
 
-1. RoleManagement
-2. KYCContract (requires RoleManagement address)
-3. TrustScore (requires RoleManagement and KYCContract addresses)
-4. LoanManagement (requires RoleManagement and TrustScore addresses)
+1. Start Ganache:
+   - Open Ganache UI and create a new workspace
+   - Set the RPC server to HTTP://127.0.0.1:7545
+   - Set the Network ID to 5777
 
-## Deployment Instructions
+2. Deploy the contracts:
+   ```bash
+   # From the project root directory
+   truffle migrate --network development
+   ```
 
-### Using Truffle or Hardhat
+3. The deployment script will automatically update your `.env.local` file with the new contract addresses.
 
-1. Install dependencies: `npm install`
-2. Compile contracts: `npx hardhat compile` or `truffle compile`
-3. Deploy to Ganache: `npx hardhat run scripts/deploy.js --network ganache` or `truffle migrate --network ganache`
+### Option 2: Using Hardhat
 
-### Manual Deployment
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Start Ganache on port 7545
+
+3. Deploy the contracts:
+   ```bash
+   npx hardhat run src/contracts/migrations/deploy_contracts.js --network ganache
+   ```
+
+### Option 3: Manual Deployment
 
 1. Start Ganache on port 7545
-2. Use the provided script in `migrations/deploy_contracts.js`
-3. Run script with Node.js: `node migrations/deploy_contracts.js`
-4. Update `.env` file with the deployed contract addresses
 
-## Development Workflow
+2. Use the provided script:
+   ```bash
+   node src/contracts/migrations/deploy_contracts.js
+   ```
 
-1. Clone the repository
-2. Install dependencies
-3. Start Ganache on port 7545
-4. Compile and deploy contracts using Truffle or Hardhat
-5. Update `.env` file with contract addresses
-6. Run the frontend application
+3. Update `.env.local` file with the deployed contract addresses
 
-## Testing
+## Verifying Deployment
 
-1. Run tests: `npx hardhat test` or `truffle test`
-2. Run coverage: `npx hardhat coverage` or `truffle run coverage`
+To verify that the contracts are deployed correctly:
+
+1. Check the `.env.local` file for the updated contract addresses
+2. Use the GanacheStatus component in the application to verify connection
+3. Try connecting to the contracts through the app interface
 
 ## Contract ABIs
 
@@ -58,6 +78,16 @@ The contract ABIs are stored in JSON format in the `abis` directory:
 - `KYCContract.json`
 - `TrustScore.json`
 - `LoanManagement.json`
+
+## Troubleshooting
+
+If you encounter issues with the deployment:
+
+1. Ensure Ganache is running on port 7545
+2. Confirm that the network ID is set to 5777
+3. Check for compilation errors in the contracts
+4. Make sure you have sufficient ETH in your Ganache account
+5. Try restarting Ganache and clearing the workspace
 
 ## Security Considerations
 
